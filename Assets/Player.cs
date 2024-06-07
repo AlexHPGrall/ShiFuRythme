@@ -191,7 +191,6 @@ public class Player : MonoBehaviour
 		double tenSecondsInTicks = beatsPerSecond * 3 * resolution;
 		if (nextNote.timestamp < tick + MetersToTickDistance(4f)) //spawn tick + 10 seconds?
 		{
-			Debug.Log("New Note");
 			try
 			{
 				bool longNote = (nextNote.duration > 0);
