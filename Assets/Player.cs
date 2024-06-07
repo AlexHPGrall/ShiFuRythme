@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Player : MonoBehaviour
 {
@@ -24,6 +25,13 @@ public class Player : MonoBehaviour
 	public float speed;
 	public uint nextBar;
 	public bool lastNoteHit = true; //mute guitar track?
+
+	private int comboCounter = 0;
+
+	private int score = 0;
+
+	public TMP_Text scoreText;
+	public TMP_Text comboText;
 
 	[System.Serializable]
 	public class Pool
@@ -386,7 +394,7 @@ public class Player : MonoBehaviour
 			if ((nextLine.strumPressed || nextLine.isHammerOn) && correctColors)
 			{
 				nextLine.succes = true;
-				//Debug.Log("Pressed strum after holding correct colors");
+				Debug.Log("Pressed strum after holding correct colors");
 			}
 			else
 			{
@@ -427,7 +435,7 @@ public class Player : MonoBehaviour
 			//Check if next line is succes or fail
 			if (nextLine.fail)
 			{
-				//Debug.Log("MISS");
+				Debug.Log("MISS");
 				for (int i = 0; i < nextLine.note.Count; ++i)
 				{
 					willRemove.Add(nextLine.note[i]);
@@ -436,10 +444,15 @@ public class Player : MonoBehaviour
 				noteCounter.number = 0;
 				lastNoteHit = false;
 				missedThisFrame = true;
+
+				comboCounter = 0;
+				
+				UpdateUITexts();
+
 			}
 			if (nextLine.succes&&!nextLine.fail)
 			{
-				//Debug.Log("HIT");
+				Debug.Log("HIT");
 				for (int i = 0; i < nextLine.note.Count; ++i)
 				{
 					willRemove.Add(nextLine.note[i]);
@@ -451,7 +464,20 @@ public class Player : MonoBehaviour
 				nextLine.Clear();
 				noteCounter.number++;
 				lastNoteHit = true;
+				comboCounter++;
+
+				if (comboCounter > 1)
+				{
+					AddScore(100 * comboCounter);
+				}
+				else
+				{
+					AddScore(100);
+				}
+				UpdateUITexts();
+
 			}
+
 		}
 
 		for (int i = willRemove.Count - 1; i > -1; --i)
@@ -478,4 +504,42 @@ public class Player : MonoBehaviour
 	{
 		return (meters / speed * resolution);
 	}
+
+	private void AddScore(int _score)
+	{
+		score += _score;
+	}
+
+	private void UpdateUITexts()
+	{
+		float maxCombo = 50;
+		scoreText.text = "Score: " + score.ToString();
+		comboText.text = comboCounter.ToString() + "x";
+
+
+		Color[] colors = new Color[] {
+			Color.grey, // 0
+			Color.white, // 1
+			Color.green, // 2
+			Color.blue, // 3
+			new Color(186f/255,85f/255,211f/255), // 4
+			new Color(255f/255,165f/255,0), // 5
+			Color.yellow // 6
+		};
+
+		int combo = Mathf.Min(comboCounter, (int)maxCombo);
+
+		int numberOfColors = colors.Length;
+		float segmentLength = maxCombo / (numberOfColors - 1);
+
+		// Determine the current segment and calculate the lerp factor
+		int currentSegment = Mathf.Min((int)(combo / segmentLength), numberOfColors - 2);
+		float lerpFactor = (combo % segmentLength) / segmentLength;
+
+		// Perform the color interpolation
+		comboText.color = Color.Lerp(colors[currentSegment], colors[currentSegment + 1], lerpFactor);
+    	
+	}
+
+
 }
