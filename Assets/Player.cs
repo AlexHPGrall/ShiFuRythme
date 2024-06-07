@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -32,6 +33,12 @@ public class Player : MonoBehaviour
 
 	public TMP_Text scoreText;
 	public TMP_Text comboText;
+
+    public List<Sprite> boomSpriteList = new List<Sprite>();
+
+	public GameObject boomPrefab;
+	public Transform boomInstanceParent;
+
 
 	[System.Serializable]
 	public class Pool
@@ -453,14 +460,23 @@ public class Player : MonoBehaviour
 			if (nextLine.succes&&!nextLine.fail)
 			{
 				Debug.Log("HIT");
-				for (int i = 0; i < nextLine.note.Count; ++i)
-				{
-					willRemove.Add(nextLine.note[i]);
-					uint fred = nextLine.note[i].fred;
-					flame[fred].gameObject.SetActive(true);
-					flame[fred].Reset();
-					flame[fred].seconds = (1f / 60f * 8f);
-				}
+				// for (int i = 0; i < nextLine.note.Count; ++i)
+				// {
+				// 	willRemove.Add(nextLine.note[i]);
+				// 	uint fred = nextLine.note[i].fred;
+				// 	flame[fred].gameObject.SetActive(true);
+				// 	flame[fred].Reset();
+				// 	flame[fred].seconds = (1f / 60f * 8f);
+				// }
+
+				GameObject boomInstance = Instantiate(boomPrefab);
+				boomInstance.transform.SetParent(boomInstanceParent.transform, false); // Add this line
+				SpriteRenderer boomSpriteRenderer = boomInstance.GetComponent<SpriteRenderer>();
+				int randomIndex = Random.Range(0, boomSpriteList.Count);
+				Sprite randomSprite = boomSpriteList[randomIndex];
+				boomSpriteRenderer.sprite = randomSprite;
+
+
 				nextLine.Clear();
 				noteCounter.number++;
 				lastNoteHit = true;
