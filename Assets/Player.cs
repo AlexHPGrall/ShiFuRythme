@@ -469,12 +469,13 @@ public class Player : MonoBehaviour
 				// 	flame[fred].seconds = (1f / 60f * 8f);
 				// }
 
+	
 				GameObject boomInstance = Instantiate(boomPrefab);
 				boomInstance.transform.SetParent(boomInstanceParent.transform, false); // Add this line
-				SpriteRenderer boomSpriteRenderer = boomInstance.GetComponent<SpriteRenderer>();
+				Image image = boomInstance.GetComponent<Image>();
 				int randomIndex = Random.Range(0, boomSpriteList.Count);
 				Sprite randomSprite = boomSpriteList[randomIndex];
-				boomSpriteRenderer.sprite = randomSprite;
+				image.sprite = randomSprite;
 
 
 				nextLine.Clear();
